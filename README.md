@@ -1,175 +1,149 @@
-# tic-tac-toe-minimax
-An implementation of Minimax AI Algorithm on Tic-Tac-Toe (or Noughts and Crosses) game. Try it: [Tic-tac-toe - Minimax](https://cledersonbc.github.io/tic-tac-toe-minimax/)
+ai-emotion-detection-from-text
 
-<p align="center">
-	<img src="preview/minimax_img.png"></img>
-</p>
+An implementation of Artificial Intelligence Emotion Detection using Natural Language Processing (NLP).
+The system analyzes a sentence and predicts the emotion expressed in the text such as happy, sad, or angry.
 
-## Introduction
-To solve games using AI, we will introduce the concept of a game tree followed by minimax algorithm. The different states of the game are represented by nodes in the game tree, very similar to the above planning problems. The idea is just slightly different. In the game tree, the nodes are arranged in levels that correspond to each player's turns in the game so that the “root” node of the tree (usually depicted at the top of the diagram) is the beginning position in the game. In tic-tac-toe, this would be the empty grid with no Xs or Os played yet. Under root, on the second level, there are the possible states that can result from the first player’s moves, be it X or O. We call these nodes the “children” of the root node.
+<p align="center"> <img src="preview/emotion_detection_demo.png"></img> </p>
+Introduction
 
-Each node on the second level, would further have as its children nodes the states that can be reached from it by the opposing player's moves. This is continued, level by level, until reaching states where the game is over. In tic-tac-toe, this means that either one of the players gets a line of three and wins, or the board is full and the game ends in a tie.
+Emotion detection from text is an important application of Artificial Intelligence and Natural Language Processing (NLP).
+It helps machines understand human emotions by analyzing written language.
 
-## What is Minimax?
-Minimax is a artificial intelligence applied in two player games, such as tic-tac-toe, checkers, chess and go. This games are known as zero-sum games, because in a mathematical representation: one player wins (+1) and other player loses (-1) or both of anyone not to win (0).
+In this project, a machine learning model is trained using a dataset of sentences labeled with emotions. When a user enters a sentence, the model processes the text and predicts the emotion behind it.
 
-## How does it works?
-The algorithm search, recursively, the best move that leads the *Max* player to win or not lose (draw). It consider the current state of the game and the available moves at that state, then for each valid move it plays (alternating *min* and *max*) until it finds a terminal state (win, draw or lose).
+Emotion detection systems are widely used in:
 
-## Understanding the Algorithm
-The algorithm was studied by the book Algorithms in a Nutshell (George Heineman; Gary Pollice; Stanley Selkow, 2009). Pseudocode (adapted):
+Chatbots
 
-```
-minimax(state, depth, player)
+Customer feedback analysis
 
-	if (player = max) then
-		best = [null, -infinity]
-	else
-		best = [null, +infinity]
+Mental health monitoring
 
-	if (depth = 0 or gameover) then
-		score = evaluate this state for player
-		return [null, score]
+Social media sentiment analysis
 
-	for each valid move m for player in state s do
-		execute move m on s
-		[move, score] = minimax(s, depth - 1, -player)
-		undo move m on s
+The main goal of this project is to demonstrate how machine learning can classify emotions from textual data.
 
-		if (player = max) then
-			if score > best.score then best = [move, score]
-		else
-			if score < best.score then best = [move, score]
+What is Emotion Detection?
 
-	return best
-end
-```
+Emotion Detection is a technique in Natural Language Processing that identifies emotions expressed in text.
 
-Now we'll see each part of this pseudocode with Python implementation. The Python implementation is available at this repository. First of all, consider it:
-> board = [
->	[0, 0, 0],
->	[0, 0, 0],
->	[0, 0, 0]
-> ]
+For example:
 
-> MAX = +1
+Input Text	Predicted Emotion
+I am very happy today	Happy
+I feel terrible today	Sad
+This is very frustrating	Angry
 
-> MIN = -1
+The system learns patterns in words and predicts the most likely emotion.
 
-The MAX may be X or O and the MIN may be O or X, whatever. The board is 3x3.
+How does it work?
 
-```python
-def minimax(state, depth, player):
-```
-* **state**: the current board in tic-tac-toe (node)
-* **depth**: index of the node in the game tree
-* **player**: may be a *MAX* player or *MIN* player
+The system works in the following steps:
 
-```python
-if player == MAX:
-	return [-1, -1, -infinity]
-else:
-	return [-1, -1, +infinity]
-```
+User enters a sentence.
 
-Both players start with your worst score. If player is MAX, its score is -infinity. Else if player is MIN, its score is +infinity. **Note:** *infinity* is an alias for inf (from math module, in Python).
+The text is converted into numerical format using CountVectorizer.
 
-The best move on the board is [-1, -1] (row and column) for all.
+The numerical data is passed to a Naive Bayes classifier.
 
-```python
-if depth == 0 or game_over(state):
-	score = evaluate(state)
-	return score
-```
+The model predicts the most probable emotion.
 
-If the depth is equal zero, then the board hasn't new empty cells to play. Or, if a player wins, then the game ended for MAX or MIN. So the score for that state will be returned.
+Understanding the Algorithm
 
-* If MAX won: return +1
-* If MIN won: return -1
-* Else: return 0 (draw)
+The machine learning pipeline used in this project:
 
-Now we'll see the main part of this code that contains recursion.
+Text Input
+     ↓
+Text Vectorization (CountVectorizer)
+     ↓
+Machine Learning Model (Naive Bayes)
+     ↓
+Emotion Prediction
+Step 1 — Convert Text to Numbers
 
-```python
-for cell in empty_cells(state):
-	x, y = cell[0], cell[1]
-	state[x][y] = player
-	score = minimax(state, depth - 1, -player)
-	state[x][y] = 0
-	score[0], score[1] = x, y
-```
+Machines cannot understand text directly.
+So the text is converted into numerical vectors.
 
-For each valid moves (empty cells):
-* **x**: receives cell row index
-* **y**: receives cell column index
-* **state[x][y]**: it's like board[available_row][available_col] receives MAX or MIN player
-* **score = minimax(state, depth - 1, -player)**:
-  * state: is the current board in recursion;
-  * depth -1: index of the next state;
-  * -player: if a player is MAX (+1) will be MIN (-1) and vice versa.
+Example:
 
-The move (+1 or -1) on the board is undo and the row, column are collected.
+"I am happy"
+↓
+[0,1,0,2,1]
 
-The next step is compare the score with best.
+This representation allows the machine learning model to process text data.
 
-```python
-if player == MAX:
-	if score[2] > best[2]:
-		best = score
-else:
-	if score[2] < best[2]:
-		best = score
-```
+Step 2 — Train the Model
 
-For MAX player, a bigger score will be received. For a MIN player, a lower score will be received. And in the end, the best move is returned. Final algorithm:
+The model learns from a labeled dataset.
 
-```python
-def minimax(state, depth, player):
-	if player == MAX:
-		best = [-1, -1, -infinity]
-	else:
-		best = [-1, -1, +infinity]
+Example dataset:
 
-	if depth == 0 or game_over(state):
-		score = evaluate(state)
-		return [-1, -1, score]
+Text                        Emotion
+-----------------------------------
+I am very happy today       happy
+I feel sad today            sad
+I am very angry right now   angry
+This makes me joyful        happy
 
-	for cell in empty_cells(state):
-		x, y = cell[0], cell[1]
-		state[x][y] = player
-		score = minimax(state, depth - 1, -player)
-		state[x][y] = 0
-		score[0], score[1] = x, y
+The model identifies patterns between words and emotions.
 
-		if player == MAX:
-			if score[2] > best[2]:
-				best = score
-		else:
-			if score[2] < best[2]:
-				best = score
+Step 3 — Prediction
 
-	return best
-```
+After training, the model can predict emotions for new sentences.
 
-## Game Tree
-Below, the best move is on the middle because the max value is on 2nd node on left.
+Example:
 
-<p align="center">
-	<img src="preview/tic-tac-toe-minimax-game-tree.png"></img>
-</p>
+Input:
+I am excited about the future
 
-Take a look that the depth is equal the valid moves on the board. The complete code is available in **py_version/**.
+Output:
+Emotion → happy
+Project Structure
+ai-emotion-detection
+│
+├── emotion_detection.py
+├── README.md
+└── preview
+    └── emotion_detection_demo.png
+Installation
 
-Simplified game tree:
+Clone the repository:
 
-<p align="center">
-	<img src="preview/simplified-g-tree.png"></img>
-</p>
+git clone https://github.com/yourusername/ai-emotion-detection.git
 
-That tree has 11 nodes. The full game tree has 549.946 nodes! You can test it putting a static global variable in your program and incrementing it for each minimax function call per turn.
+Install the required libraries:
 
-In a more complex game, such as chess, it's hard to search whole game tree. However, Alpha–beta Pruning is an optimization method to the minimax algorithm that allows us to disregard some branches in the search tree, because he cuts irrelevant nodes (subtrees) in search. For more information, see:
+pip install pandas scikit-learn nltk
+Running the Project
 
-* Book: George T. Heineman; Gary Pollice; Stanley Selkow. Algorithms in a nutshell. O'Reilly, 2009.
-* Wikipédia: <https://en.wikipedia.org/wiki/Minimax>
-* Nanyang Technological University: <https://www.ntu.edu.sg/home/ehchua/programming/java/JavaGame_TicTacToe_AI.html>
+Run the Python script:
+
+python emotion_detection.py
+
+Example interaction:
+
+Enter a sentence: I feel very happy today
+Detected Emotion: happy
+Technologies Used
+
+Python
+
+Pandas
+
+Scikit-learn
+
+Natural Language Processing (NLP)
+
+Future Improvements
+
+Possible improvements for the project:
+
+Use a larger dataset
+
+Add more emotions such as fear, surprise, disgust
+
+Build a web interface using Streamlit
+
+Improve accuracy using Deep Learning models
+
+Deploy the project as a web application
